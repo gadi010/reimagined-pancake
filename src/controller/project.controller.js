@@ -1,3 +1,4 @@
+import { getWorkCounts } from "../components/get-work-counts.js";
 import prisma from "../lib/prisma.js";
 
 
@@ -50,7 +51,7 @@ export const getActiveProjects = async (req, res) => {
         },
     });
 
-   const active_projects = await prisma.project.findMany({
+    const active_projects = await prisma.project.findMany({
         where: {
             members: {
                 some: {
@@ -69,7 +70,7 @@ export const getActiveProjects = async (req, res) => {
                 where: { userId },
                 select: { role: true }
             }
-        }, 
+        },
     })
 
     res.send({
@@ -83,4 +84,52 @@ export const getActiveProjects = async (req, res) => {
         data: active_projects
     })
 
+}
+
+export const projectAnalytics = async (req, res) => {
+    const userId = req.user.userId;
+    const projectId = parseInt(req.params.projectId);
+    const selectedUser = req.query.selectedUser ? parseInt(req.query.selectedUser) : null;
+    try {
+
+
+        const projectMember = await prisma.projectMember.findFirst({
+            where: {
+                projectId, userId
+            },
+            select: { id: true, role: true }
+        });
+
+        if (!projectMember) res.status(403).json({ error: "Access denied to this project" });
+        console.log('|| Project Member ||', projectMember);
+
+        const { role } = projectMember;
+        console.log('|| Role || ', role);
+        const baseFilter = {
+            projectId,
+        };
+
+        if (role !== '101' || role !== '201' || role !== '501') {
+            if (selectedUser) {
+                baseFilter.project = { members: { some: { userId: selectedUser } } };
+            }
+        } else {
+            baseFilter.project = { members: { some: { userId: userId } } }
+        }
+        console.log(baseFilter);
+
+        const works = await prisma.work.findMany({
+            where: {
+                ...baseFilter,
+            },
+            select: { type: true, status: true, }
+        });
+
+        const workCount = getWorkCounts(works);
+
+        res.status(200).json(workCount);
+    } catch (error) {
+        console.log('|| Error ||', error);
+        res.status(500).json({ error: "Internal server error", error });
+    }
 }

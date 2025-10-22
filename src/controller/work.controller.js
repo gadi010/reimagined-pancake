@@ -234,7 +234,6 @@ export const getWorkStats = async (req, res) => {
       prisma.work.count({ where: { projectId: intPro, type: 'bug' } }),
     ]);
 
-    // Calculate progress (percentage of completed works)
     const progress = total_work_count > 0
       ? Math.round((total_completed_work_count / total_work_count) * 100)
       : 0;
