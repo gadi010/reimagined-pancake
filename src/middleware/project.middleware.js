@@ -14,7 +14,6 @@ export const projectMiddleware = (req, res, next) => {
     if (!decoded) {
         return res.status(403).json({ error: "Invalid token" });
     }
-
     req.user = decoded;
     next();
 }

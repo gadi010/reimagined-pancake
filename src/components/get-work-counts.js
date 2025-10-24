@@ -56,3 +56,50 @@ export const getWorkCounts = (work) => {
     };
     return response;
 }
+
+export const getFilter = (message) => {
+  // Example message: "feat: solve the issue 10 completed"
+  const parts = message.trim().split(':');
+  if (parts.length < 2) return null;
+
+  const type = parts[0].trim().toLowerCase(); // e.g. feat | fix | task
+  const details = parts[1].trim().toLowerCase(); // e.g. "solve the issue 10 completed"
+
+  // Extract first number (work ID)
+  const idMatch = details.match(/\b\d+\b/);
+  const id = idMatch ? parseInt(idMatch[0]) : null;
+
+  // Extract status keyword
+  const statusMatch = details.match(/\b(completed|done|in\s*progress|progress)\b/);
+  const statusRaw = statusMatch ? statusMatch[0].toLowerCase() : null;
+
+  if (!id || isNaN(id)) return null;
+
+  // Map commit type
+  let workType = '';
+  switch (type) {
+    case 'task':
+      workType = 'task';
+      break;
+    case 'feat':
+      workType = 'feature';
+      break;
+    case 'fix':
+      workType = 'bug';
+      break;
+    default:
+      return null;
+  }
+
+  // Normalize status
+  let workStatus = '';
+  if (statusRaw === 'completed' || statusRaw === 'done') workStatus = 'completed';
+  else if (statusRaw && statusRaw.includes('progress')) workStatus = 'in_progress';
+  else workStatus = 'todo';
+
+  return {
+    id,
+    type: workType,
+    status: workStatus,
+  };
+};

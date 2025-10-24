@@ -5,8 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
+  provider        = "prisma-client-js"
+  output          = "../src/generated/prisma"
   previewFeatures = ["referentialActions"]
 }
 
@@ -44,18 +44,40 @@ model ProjectMember {
   userId    Int
   role      String?
 }
-
 model Project {
-  id          Int             @id @default(autoincrement())
-  title       String
-  description String
-  createdBy   User            @relation(fields: [createdById], references: [id])
-  createdById Int
-  members     ProjectMember[]
-  works       Work[]
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  id           Int             @id @default(autoincrement())
+  title        String
+  description  String
+  dueDate      DateTime?    
+  createdBy    User            @relation(fields: [createdById], references: [id])
+  createdById  Int
+  members      ProjectMember[]
+  works        Work[]
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  
+  
+  github       GithubRepo?     @relation(fields: [githubRepoId], references: [id])
+  githubRepoId Int?            
 }
+
+model GithubRepo {
+  id          Int       @id @default(autoincrement())
+  repoId      Int       @unique
+  name        String
+  fullName    String
+  private     Boolean
+  htmlUrl     String
+  description String?
+  ownerLogin  String
+  ownerId     Int
+  webhook     String?   
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  projects    Project[] 
+}
+
 
 model Work {
   id          Int            @id @default(autoincrement())
@@ -67,8 +89,8 @@ model Work {
   createBy    User           @relation(fields: [createById], references: [id])
   createById  Int
   assignees   WorkAssignee[]
-  status      String         
-  progress    Int?            @default(0) // 0-100 for progress bar
+  status      String
+  progress    Int?           @default(0) 
   attachments Attachment[]
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
@@ -101,4 +123,3 @@ model Attachment {
 //   message   String
 //   createdAt DateTime @default(now())
 // }
-

@@ -1,11 +1,15 @@
+import 'dotenv/config';
+
 import express from "express";
 import cors  from "cors";
+
 import authrouter from "./routes/auth.route.js";
 import projectrouter from "./routes/project.route.js";
-import 'dotenv/config'
 import workRouter from "./routes/work.route.js";
 import userrouter from "./routes/user.route.js";
 import testrouter from "./routes/test.route.js";
+import githubRouter from "./routes/github.route.js";
+
 const app = express();
 
 
@@ -22,6 +26,6 @@ app.use('/api/v1/project', projectrouter)
 app.use('/api/v1/work', workRouter)
 app.use('/api/v1/user', userrouter)
 app.use('/api/v1/test', testrouter)
-
+app.use('/api/v1/github', githubRouter)
 
 export default app;

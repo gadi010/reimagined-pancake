@@ -4,7 +4,7 @@ import prisma from "../lib/prisma.js";
 
 export const createProject = async (req, res) => {
 
-    const { title, description } = req.body;
+    const { title, description, dueDate } = req.body;
 
     const { userId } = req.user;
 
@@ -21,6 +21,7 @@ export const createProject = async (req, res) => {
         data: {
             title,
             description,
+            dueDate,
             createdBy: {
                 connect: { id: userId },
             },
@@ -133,3 +134,122 @@ export const projectAnalytics = async (req, res) => {
         res.status(500).json({ error: "Internal server error", error });
     }
 }
+export const getProjectsProgress = async (req, res) => {
+    try {
+        const userId = req.user.userId
+        if (!userId) {
+            return res.status(400).json({ success: false, message: "Missing userId" });
+        }
+
+        const projects = await prisma.project.findMany({
+            where: {
+                OR: [
+                    { createdById: Number(userId) },
+                    { members: { some: { userId: Number(userId) } } },
+                ],
+            },
+            take: 3,
+            orderBy: {
+                id: "desc",
+            },
+            select: {
+                id: true,
+                title: true,
+                works: {
+                    select: { progress: true },
+                },
+            },
+        });
+
+        if (!projects.length) {
+            return res.status(404).json({
+                success: false,
+                message: "No projects found for this user",
+            });
+        }
+
+        const projectData = projects.map((project) => {
+            const works = project.works || [];
+            const totalProgress = works.reduce((sum, w) => sum + (w.progress || 0), 0);
+            const averageProgress =
+                works.length > 0 ? totalProgress / works.length : 0;
+
+            return {
+                id: project.id,
+                name: project.title,
+                progress: Math.round(averageProgress),
+            };
+        });
+
+        return res.status(200).json({
+            success: true,
+            projects: projectData,
+        });
+    } catch (error) {
+        console.error("💥 Error in getProjectsProgress:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+            error: error.message,
+        });
+    }
+};
+
+export const getProjectsNearDeadline = async (req, res) => {
+  try {
+    const userId = req.user?.userId || req.query.userId; 
+    if (!userId) {
+      return res.status(400).json({ success: false, message: "Missing userId" });
+    }
+
+    
+    const projects = await prisma.project.findMany({
+      where: {
+        AND: [
+          {
+            OR: [
+              { createdById: Number(userId) },
+              { members: { some: { userId: Number(userId) } } },
+            ],
+          },
+          { dueDate: { not: null } }, 
+        ],
+      },
+      take: 5, 
+      orderBy: { dueDate: "asc" }, 
+      select: {
+        id: true,
+        title: true,
+        dueDate: true,
+      },
+    });
+
+    if (!projects.length) {
+      return res.status(404).json({ success: false, message: "No projects with deadlines found" });
+    }
+
+    
+    const projectData = projects.map((project) => {
+      const works = project.works || [];
+      const totalProgress = works.reduce((sum, w) => sum + (w.progress || 0), 0);
+      const averageProgress = works.length > 0 ? totalProgress / works.length : 0;
+
+      return {
+        id: project.id,
+        name: project.title,
+        progress: Math.round(averageProgress),
+        dueDate: project.dueDate,
+      };
+    });
+
+    
+    return res.status(200).json({ success: true, projects: projectData });
+  } catch (error) {
+    console.error("💥 Error in getProjectsNearDeadline:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
