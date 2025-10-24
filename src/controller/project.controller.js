@@ -21,7 +21,7 @@ export const createProject = async (req, res) => {
         data: {
             title,
             description,
-            dueDate,
+            dueDate: new Date(dueDate),
             createdBy: {
                 connect: { id: userId },
             },
