@@ -45,6 +45,18 @@ export const registerUser = async (req, res) => {
           },
         });
         console.log('|| Provider added for existing user ||', provider);
+      } else {
+        const updatingProvider = await prisma.provider.update({
+          where: {
+            email: user.email
+          },
+          data: {
+            accessToken
+          }
+        })
+
+        console.log('|| Provider updated for existing user ||', updatingProvider);
+
       }
     }
 

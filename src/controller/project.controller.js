@@ -70,6 +70,12 @@ export const getActiveProjects = async (req, res) => {
             members: {
                 where: { userId },
                 select: { role: true }
+            },
+            github: {
+                select: {
+                    name: true,
+                    repoId: true,
+                }
             }
         },
     })

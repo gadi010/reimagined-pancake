@@ -60,9 +60,11 @@ export const createGithubRepo = async (req, res) => {
         if (!user) return res.status(404).json({ error: "User not found" });
         const hasGithubProvider = user.providers.find(p => p.name === "github");
         if (!hasGithubProvider) return res.status(400).json({ error: "GitHub not connected" });
-        try {
+      console.log(user,name, process.env.API_URL, hasGithubProvider.accessToken, webhook);
+        console.log("tis is the webhook url", webhook )
+      try {
             await axios.post(
-                `https://api.github.com/repos/${user.name}/${name}/hooks`,
+                webhook,
                 {
                     name: "web",
                     active: true,
@@ -76,7 +78,7 @@ export const createGithubRepo = async (req, res) => {
                 {
                     headers: {
                         Authorization: `token ${hasGithubProvider.accessToken}`,
-                        Accept: "application/vnd.github.v3+json"
+                        Accept: "application/vnd.github+json"
                     }
                 }
             );
