@@ -5,110 +5,131 @@ import { getFilter } from "../components/get-work-counts.js";
 
 
 export const getGithubRepo = async (req, res) => {
-    const userId = req.user.userId;
+  const userId = req.user.userId;
+
+  try {
+    const provider = await prisma.provider.findFirst({
+      where: { id: userId },
+      select: {
+        accessToken: true,
+      },
+    });
+    console.log('| provider |', provider);
+
+    if (!provider) return res.status(400).json({ error: "GitHub not connected" });
 
     try {
-        const provider = await prisma.provider.findFirst({
-            where: { id: userId },
-            select: {
-                accessToken: true,
-            },
-        });
-        console.log('| provider |', provider);
+      const response = await axios.get('https://api.github.com/user/repos', {
+        headers: {
+          Authorization: `token ${provider.accessToken}`,
+        },
+      });
 
-        if (!provider) return res.status(400).json({ error: "GitHub not connected" });
-
-        try {
-            const response = await axios.get('https://api.github.com/user/repos', {
-                headers: {
-                    Authorization: `token ${provider.accessToken}`,
-                },
-            });
-
-            return res.status(200).json({ repositories: response.data });
-        } catch (error) {
-            res.status(500).json({ error: 'Failed to fetch GitHub repositories', error: error });
-        }
+      return res.status(200).json({ repositories: response.data });
     } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error', errorMessage: error.message });
+      res.status(500).json({ error: 'Failed to fetch GitHub repositories', error: error });
     }
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error', errorMessage: error.message });
+  }
 }
 
 export const createGithubRepo = async (req, res) => {
-    const projectId = parseInt(req.params.projectId);
-    const userId = req.user.userId;
+  const projectId = parseInt(req.params.projectId);
+  const userId = req.user.userId;
 
-    const { repoId,
+  const {
+    repoId,
+    name,
+    fullName,
+    private: is_private,
+    htmlUrl,
+    description,
+    ownerLogin,
+    ownerId,
+    webhook,
+  } = req.body;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        providers: true,
+      },
+    });
+
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    const hasGithubProvider = user.providers.find(p => p.name === "github");
+    if (!hasGithubProvider) return res.status(400).json({ error: "GitHub not connected" });
+
+    try {
+      const response = await axios.post(
+        webhook,
+        {
+          name: "web",
+          active: true,
+          events: ["push"],
+          config: {
+            url: `${process.env.API_URL}/github/webhook`,
+            content_type: "json",
+            insecure_ssl: "0",
+          },
+        },
+        {
+          headers: {
+            Authorization: `token ${hasGithubProvider.accessToken}`,
+            Accept: "application/vnd.github+json",
+          },
+        }
+      );
+
+      console.log("✅ Webhook created successfully:", response.data);
+    } catch (error) {
+      const errMsg = error.response?.data?.errors?.[0]?.message;
+
+      if (errMsg === "Hook already exists on this repository") {
+        console.log("⚠️ Webhook already exists — skipping creation.");
+      } else {
+        console.error(
+          "❌ Error creating webhook:",
+          error.response ? error.response.data : error.message
+        );
+        return res.status(500).json({
+          error: "Failed to create webhook on GitHub",
+          errorMessage: error.message,
+        });
+      }
+    }
+
+    const createRepo = await prisma.githubRepo.create({
+      data: {
+        repoId,
         name,
         fullName,
-        is_private,
+        private: is_private,
         htmlUrl,
         description,
         ownerLogin,
         ownerId,
         webhook,
-    } = req.body;
+        project: {
+          connect: { id: projectId },
+        },
+      },
+    });
 
-    try {
-
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            include: {
-                providers: true,
-            },
-        });
-        if (!user) return res.status(404).json({ error: "User not found" });
-        const hasGithubProvider = user.providers.find(p => p.name === "github");
-        if (!hasGithubProvider) return res.status(400).json({ error: "GitHub not connected" });
-      console.log(user,name, process.env.API_URL, hasGithubProvider.accessToken, webhook);
-        console.log("tis is the webhook url", webhook )
-      try {
-            await axios.post(
-                webhook,
-                {
-                    name: "web",
-                    active: true,
-                    events: ["push"],
-                    config: {
-                        url: `${process.env.API_URL}/github/webhook`,
-                        content_type: "json",
-                        insecure_ssl: "0"
-                    }
-                },
-                {
-                    headers: {
-                        Authorization: `token ${hasGithubProvider.accessToken}`,
-                        Accept: "application/vnd.github+json"
-                    }
-                }
-            );
-        }
-        catch (error) {
-            console.error('Error creating webhook:', error.response ? error.response.data : error.message);
-            return res.status(500).json({ error: 'Failed to create webhook on GitHub', errorMessage: error.message });
-        }
-
-        const createRepo = await prisma.githubRepo.create({
-            data: {
-                repoId,
-                name,
-                fullName,
-                private: is_private,
-                htmlUrl,
-                description,
-                ownerLogin,
-                ownerId,
-                webhook,
-                project: {
-                    connect: { id: projectId }
-                }
-            }
-        });
-        return res.status(201).json(createRepo);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error', errorMessage: error.message });
-    }
-}
+    return res.status(201).json({
+      message: "GitHub repo linked successfully",
+      repo: createRepo,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: "Internal Server Error",
+      errorMessage: error.message,
+    });
+  }
+};
 
 export const handleWebhook = async (req, res) => {
   try {
@@ -152,7 +173,7 @@ export const handleWebhook = async (req, res) => {
         where: {
           id,
           type,
-          userId: user.id, 
+          userId: user.id,
         },
         data: {
           status,
