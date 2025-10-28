@@ -113,7 +113,7 @@ export const createGithubRepo = async (req, res) => {
         ownerLogin,
         ownerId,
         webhook,
-        project: {
+        projects: {
           connect: { id: projectId },
         },
       },
