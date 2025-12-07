@@ -9,6 +9,10 @@
         {
             "url": "http://localhost:5000/api/v1",
             "description": "Development Server"
+        },
+        {
+            "url": "https://reimagined-pancake.onrender.com/api/v1/",
+            "description": "Production Server (Free hosted)"
         }
     ],
      "tags": [
