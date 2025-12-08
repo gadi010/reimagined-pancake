@@ -44,26 +44,26 @@ model ProjectMember {
   userId    Int
   role      String?
 }
+
 model Project {
-  id           Int             @id @default(autoincrement())
-  title        String
-  description  String
-  dueDate      DateTime?    
-  createdBy    User            @relation(fields: [createdById], references: [id])
-  createdById  Int
-  members      ProjectMember[]
-  works        Work[]
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
-  
-  
-  github       GithubRepo?     @relation(fields: [githubRepoId], references: [id])
-  githubRepoId Int?            
+  id          Int             @id @default(autoincrement())
+  title       String
+  description String
+  dueDate     DateTime?
+  createdBy   User            @relation(fields: [createdById], references: [id])
+  createdById Int
+  members     ProjectMember[]
+  works       Work[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  github       GithubRepo? @relation(fields: [githubRepoId], references: [id])
+  githubRepoId Int?
 }
 
 model GithubRepo {
-  id          Int       @id @default(autoincrement())
-  repoId      Int       @unique
+  id          Int      @id @default(autoincrement())
+  repoId      Int      @unique
   name        String
   fullName    String
   private     Boolean
@@ -71,13 +71,12 @@ model GithubRepo {
   description String?
   ownerLogin  String
   ownerId     Int
-  webhook     String?   
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  webhook     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  projects    Project[] 
+  projects Project[]
 }
-
 
 model Work {
   id          Int            @id @default(autoincrement())
@@ -90,7 +89,7 @@ model Work {
   createById  Int
   assignees   WorkAssignee[]
   status      String
-  progress    Int?           @default(0) 
+  progress    Int?           @default(0)
   attachments Attachment[]
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
