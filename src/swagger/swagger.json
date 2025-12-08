@@ -1,5 +1,6 @@
 {
     "openapi": "3.0.0",
+    "title": "Project Management System API",
     "info": {
         "title": "Existing API for Project management System",
         "version": "1.0.0",

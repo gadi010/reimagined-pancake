@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon --watch src --ext ts --exec ts-node index.ts",
-    "build": "tsc && prisma generate && npm run copy-generated",
+    "build": "prisma generate && tsc && npm run copy-generated",
     "copy-generated": "cpx \"src/generated/**/*\" dist/src/generated",
     "start": "node dist/index.js"
   },
