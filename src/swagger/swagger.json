@@ -1,8 +1,8 @@
 {
     "openapi": "3.0.0",
-    "title": "Project Management System API",
+    "title": "Project Management System ",
     "info": {
-        "title": "Existing API for Project management System",
+        "title": "Existing API for Project management ",
         "version": "1.0.0",
         "description": "API documentation for my backend service"
     },
@@ -16,7 +16,7 @@
             "description": "Production Server (Free hosted)"
         }
     ],
-     "tags": [
+    "tags": [
         {
             "name": "Authentication",
             "description": "User authentication and profile management"
@@ -239,19 +239,89 @@
             "ProjectAnalytics": {
                 "type": "object",
                 "properties": {
-                    "todo": {
+                    "total_work_count": {
                         "type": "integer",
-                        "example": 5
+                        "description": "Total number of work items"
                     },
-                    "inProgress": {
+                    "completed_work_count": {
                         "type": "integer",
-                        "example": 10
+                        "description": "Number of completed work items"
                     },
-                    "done": {
+                    "inprogress_work_count": {
                         "type": "integer",
-                        "example": 3
+                        "description": "Number of work items in progress"
+                    },
+                    "untouched_work_count": {
+                        "type": "integer",
+                        "description": "Number of untouched work items"
+                    },
+                    "total_task_count": {
+                        "type": "integer",
+                        "description": "Total number of tasks"
+                    },
+                    "completed_task_count": {
+                        "type": "integer",
+                        "description": "Number of completed tasks"
+                    },
+                    "inprogress_task_count": {
+                        "type": "integer",
+                        "description": "Number of tasks in progress"
+                    },
+                    "untouched_task_count": {
+                        "type": "integer",
+                        "description": "Number of untouched tasks"
+                    },
+                    "total_feature_count": {
+                        "type": "integer",
+                        "description": "Total number of features"
+                    },
+                    "completed_feature_count": {
+                        "type": "integer",
+                        "description": "Number of completed features"
+                    },
+                    "inprogress_feature_count": {
+                        "type": "integer",
+                        "description": "Number of features in progress"
+                    },
+                    "untouched_feature_count": {
+                        "type": "integer",
+                        "description": "Number of untouched features"
+                    },
+                    "total_bug_count": {
+                        "type": "integer",
+                        "description": "Total number of bugs"
+                    },
+                    "completed_bug_count": {
+                        "type": "integer",
+                        "description": "Number of completed bugs"
+                    },
+                    "inprogress_bug_count": {
+                        "type": "integer",
+                        "description": "Number of bugs in progress"
+                    },
+                    "untouched_bug_count": {
+                        "type": "integer",
+                        "description": "Number of untouched bugs"
                     }
-                }
+                },
+                "required": [
+                    "total_work_count",
+                    "completed_work_count",
+                    "inprogress_work_count",
+                    "untouched_work_count",
+                    "total_task_count",
+                    "completed_task_count",
+                    "inprogress_task_count",
+                    "untouched_task_count",
+                    "total_feature_count",
+                    "completed_feature_count",
+                    "inprogress_feature_count",
+                    "untouched_feature_count",
+                    "total_bug_count",
+                    "completed_bug_count",
+                    "inprogress_bug_count",
+                    "untouched_bug_count"
+                ]
             },
             "Work": {
                 "type": "object",
@@ -354,13 +424,370 @@
                     "type",
                     "assignee"
                 ]
+            },
+            "GithubRepo": {
+                "type": "object",
+                "properties": {
+                    "repoId": {
+                        "type": "integer",
+                        "description": "The unique ID of the repository"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Repository name"
+                    },
+                    "fullName": {
+                        "type": "string",
+                        "description": "Full repository name including owner"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Repository description"
+                    },
+                    "htmlUrl": {
+                        "type": "string",
+                        "description": "Repository URL on GitHub"
+                    },
+                    "ownerId": {
+                        "type": "integer",
+                        "description": "GitHub user ID of the owner"
+                    },
+                    "ownerLogin": {
+                        "type": "string",
+                        "description": "GitHub username of the owner"
+                    },
+                    "private": {
+                        "type": "boolean",
+                        "description": "Is the repository private"
+                    },
+                    "webhook": {
+                        "type": "string",
+                        "description": "Webhook URL for repository events"
+                    }
+                },
+                "required": [
+                    "repoId",
+                    "name",
+                    "fullName",
+                    "description",
+                    "htmlUrl",
+                    "ownerId",
+                    "ownerLogin",
+                    "private",
+                    "webhook"
+                ]
+            },
+            "GithubRepos": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/components/schemas/GithubRepo"
+                }
+            },
+            "GitHubRepoCreateRequest": {
+                "type": "object",
+                "properties": {
+                    "repoId": {
+                        "type": "integer",
+                        "description": "The unique ID of the repository"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Repository name to create"
+                    },
+                    "fullName": {
+                        "type": "string",
+                        "description": "Full repository name including owner"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Repository description"
+                    },
+                    "htmlUrl": {
+                        "type": "string",
+                        "description": "Repository URL on GitHub"
+                    },
+                    "ownerId": {
+                        "type": "integer",
+                        "description": "GitHub user ID of the owner"
+                    },
+                    "ownerLogin": {
+                        "type": "string",
+                        "description": "GitHub username of the owner"
+                    },
+                    "private": {
+                        "type": "boolean",
+                        "description": "Set to true if repository should be private"
+                    },
+                    "webhook": {
+                        "type": "string",
+                        "description": "Webhook URL for repository events"
+                    }
+                },
+                "required": [
+                    "repoId",
+                    "name",
+                    "fullName",
+                    "description",
+                    "htmlUrl",
+                    "ownerId",
+                    "ownerLogin",
+                    "private",
+                    "webhook"
+                ]
+            },
+            "ProjectMember": {
+                "type": "object",
+                "properties": {
+                    "role": {
+                        "type": "string",
+                        "description": "Role of the member in the project"
+                    }
+                },
+                "required": [
+                    "role"
+                ]
+            },
+            "Project": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Project ID"
+                    },
+                    "title": {
+                        "type": "string",
+                        "description": "Project title"
+                    },
+                    "createdById": {
+                        "type": "integer",
+                        "description": "ID of the user who created the project"
+                    },
+                    "members": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProjectMember"
+                        }
+                    },
+                    "github": {
+                        "type": [
+                            "array",
+                            "null"
+                        ],
+                        "items": {
+                            "$ref": "#/components/schemas/GithubRepo"
+                        },
+                        "description": "GitHub repositories linked to the project, or null"
+                    }
+                },
+                "required": [
+                    "id",
+                    "title",
+                    "createdById",
+                    "members",
+                    "github"
+                ]
+            },
+            "PaginatedProjects": {
+                "type": "object",
+                "properties": {
+                    "link": {
+                        "type": "object",
+                        "properties": {
+                            "next": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "prev": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "next",
+                            "prev"
+                        ]
+                    },
+                    "total_count": {
+                        "type": "integer"
+                    },
+                    "page": {
+                        "type": "integer"
+                    },
+                    "page_size": {
+                        "type": "integer"
+                    },
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Project"
+                        }
+                    }
+                },
+                "required": [
+                    "link",
+                    "total_count",
+                    "page",
+                    "page_size",
+                    "data"
+                ]
+            },
+            "ProjectStats": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "description": "Project title"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Project description"
+                    },
+                    "progress": {
+                        "type": "integer",
+                        "description": "Project progress percentage"
+                    }
+                },
+                "required": [
+                    "title",
+                    "description",
+                    "progress"
+                ]
+            },
+            "StatCard": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "description": "Title of the stat"
+                    },
+                    "count": {
+                        "type": "integer",
+                        "description": "Count of the stat"
+                    }
+                },
+                "required": [
+                    "title",
+                    "count"
+                ]
+            },
+            "ProjectStatsCardResponse": {
+                "type": "object",
+                "properties": {
+                    "project": {
+                        "$ref": "#/components/schemas/ProjectStats"
+                    },
+                    "stats": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/StatCard"
+                        }
+                    }
+                },
+                "required": [
+                    "project",
+                    "stats"
+                ]
+            },
+            "ProjectProgressItem": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Project ID"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Project title"
+                    },
+                    "progress": {
+                        "type": "integer",
+                        "description": "Average project progress percentage"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "progress"
+                ]
+            },
+            "ProjectProgressResponse": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "description": "Whether the request was successful"
+                    },
+                    "projects": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProjectProgressItem"
+                        }
+                    }
+                },
+                "required": [
+                    "success",
+                    "projects"
+                ]
+            },
+            "ProjectDeadlineItem": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Project ID"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Project title"
+                    },
+                    "progress": {
+                        "type": "integer",
+                        "description": "Average project progress percentage"
+                    },
+                    "dueDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Project deadline"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "progress",
+                    "dueDate"
+                ]
+            },
+            "ProjectDeadlineResponse": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "description": "Whether the request was successful"
+                    },
+                    "projects": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProjectDeadlineItem"
+                        }
+                    }
+                },
+                "required": [
+                    "success",
+                    "projects"
+                ]
             }
         }
     },
     "paths": {
         "/auth/register": {
             "post": {
-                "tags": ["Authentication"],
+                "tags": [
+                    "Authentication"
+                ],
                 "summary": "Register or login user via GitHub",
                 "requestBody": {
                     "required": true,
@@ -394,7 +821,9 @@
         },
         "/auth/profile": {
             "get": {
-                "tags": ["Authentication"],
+                "tags": [
+                    "Authentication"
+                ],
                 "summary": "Get logged-in user's profile",
                 "security": [
                     {
@@ -431,7 +860,9 @@
         },
         "/github/repo": {
             "get": {
-                "tags": ["GitHub"],
+                "tags": [
+                    "GitHub"
+                ],
                 "summary": "Get all GitHub repositories for the logged-in user",
                 "security": [
                     {
@@ -449,7 +880,7 @@
                                         "repositories": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/components/schemas/GitHubRepo"
+                                                "$ref": "#/components/schemas/GithubRepo"
                                             }
                                         }
                                     }
@@ -468,7 +899,9 @@
         },
         "/github/repo/{projectId}": {
             "post": {
-                "tags": ["GitHub"],
+                "tags": [
+                    "GitHub"
+                ],
                 "summary": "Link a GitHub repository to a project and create a webhook",
                 "security": [
                     {
@@ -531,7 +964,9 @@
         },
         "/github/webhook": {
             "post": {
-                "tags": ["GitHub"],
+                "tags": [
+                    "GitHub"
+                ],
                 "summary": "Receive GitHub webhook events",
                 "security": [
                     {
@@ -582,7 +1017,9 @@
         },
         "/project/create-project": {
             "post": {
-                "tags": ["Project"],
+                "tags": [
+                    "Project"
+                ],
                 "summary": "Create a new project",
                 "security": [
                     {
@@ -621,7 +1058,9 @@
         },
         "/project/active-projects": {
             "get": {
-                "tags": ["Project"],
+                "tags": [
+                    "Project"
+                ],
                 "summary": "Get active projects for the logged-in user",
                 "security": [
                     {
@@ -652,7 +1091,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "$ref": "#/components/schemas/PaginatedProjects"
                                 }
                             }
                         }
@@ -665,7 +1104,9 @@
         },
         "/project/analytics/{projectId}": {
             "get": {
-                "tags": ["Project"],
+                "tags": [
+                    "Project"
+                ],
                 "summary": "Get project analytics by projectId",
                 "security": [
                     {
@@ -714,7 +1155,9 @@
         },
         "/project/project-progress": {
             "get": {
-                "tags": ["Project"],
+                "tags": [
+                    "Project"
+                ],
                 "summary": "Get project progress for logged-in user",
                 "security": [
                     {
@@ -727,7 +1170,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "$ref": "#/components/schemas/ProjectProgressResponse"
                                 }
                             }
                         }
@@ -743,7 +1186,9 @@
         },
         "/project/project-deadline": {
             "get": {
-                "tags": ["Project"],
+                "tags": [
+                    "Project"
+                ],
                 "summary": "Get projects near their deadline",
                 "security": [
                     {
@@ -756,7 +1201,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "$ref": "#/components/schemas/ProjectDeadlineResponse"
                                 }
                             }
                         }
@@ -772,7 +1217,9 @@
         },
         "/user/adduser": {
             "post": {
-                "tags": ["User"],
+                "tags": [
+                    "User"
+                ],
                 "summary": "Add a user to a project",
                 "security": [
                     {
@@ -811,7 +1258,9 @@
         },
         "/user/{projectId}": {
             "get": {
-                "tags": ["User"],
+                "tags": [
+                    "User"
+                ],
                 "summary": "Get all users for a specific project",
                 "security": [
                     {
@@ -875,7 +1324,9 @@
         },
         "/user/{projectId}/search": {
             "get": {
-                "tags": ["User"],
+                "tags": [
+                    "User"
+                ],
                 "summary": "Search project users by email",
                 "security": [
                     {
@@ -938,7 +1389,9 @@
         },
         "/work/{projectId}/create-work": {
             "post": {
-                "tags": ["Work"],
+                "tags": [
+                    "Work"
+                ],
                 "summary": "Create a new work item in a project",
                 "security": [
                     {
@@ -988,7 +1441,9 @@
         },
         "/work/{projectId}": {
             "get": {
-                "tags": ["Work"],
+                "tags": [
+                    "Work"
+                ],
                 "summary": "Get all works in a project",
                 "security": [
                     {
@@ -1092,7 +1547,9 @@
         },
         "/work/{projectId}/update-work/{workId}": {
             "patch": {
-                "tags": ["Work"],
+                "tags": [
+                    "Work"
+                ],
                 "summary": "Update an existing work item",
                 "security": [
                     {
@@ -1149,7 +1606,9 @@
         },
         "/work/{workId}": {
             "delete": {
-                "tags": ["Work"],
+                "tags": [
+                    "Work"
+                ],
                 "summary": "Delete a work item by ID",
                 "security": [
                     {
@@ -1178,7 +1637,9 @@
         },
         "/work/{projectId}/stats-card": {
             "get": {
-                "tags": ["Work"],
+                "tags": [
+                    "Work"
+                ],
                 "summary": "Get work stats for a project",
                 "security": [
                     {
@@ -1197,7 +1658,14 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Project stats retrieved successfully"
+                        "description": "Project stats retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProjectStatsCardResponse"
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Project not found"

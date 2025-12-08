@@ -145,6 +145,7 @@ export const projectAnalytics = async (req: Request, res: Response) => {
         res.status(500).json({ message: "Internal server error", error });
     }
 }
+
 export const getProjectsProgress = async (req: Request, res: Response) => {
     try {
         const userId = req.user.userId
